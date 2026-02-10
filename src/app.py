@@ -32,33 +32,48 @@ def load_or_train_model():
     model_path = os.path.join(parent_dir, 'models', 'rain_model.pkl')
     data_path = os.path.join(parent_dir, 'data', 'rain_data.csv')
     
-    # Si el modelo no existe o falla la carga, re-entrenamos
-    if not os.path.exists(model_path):
-        st.warning("⚠️ Modelo no encontrado en el servidor. Iniciando entrenamiento automático...")
+    model = None
+    
+    # Intentar cargar modelo existente
+    if os.path.exists(model_path):
+        try:
+            model = joblib.load(model_path)
+            # Prueba rápida de predicción para asegurar compatibilidad
+            # Si falla (ej. sklearn version mismatch), saltará al except
+            model.predict([[1, 1, 25, 70, 1013, 0, 0, 0, 25, 25, 25, 70, 70, 70, 1013, 1013, 1013, 0]])
+            return model
+        except Exception as e:
+            st.warning(f"⚠️ Modelo existente incompatible o corrupto ({e}). Re-entrenando...")
+            model = None
+
+    # Si no existe o falló la carga, entrenamos
+    if model is None:
+        st.info("🔄 Iniciando entrenamiento del modelo en el entorno nube...")
         
-        with st.spinner('Generando datos sintéticos...'):
-            generate_synthetic_data(output_file=os.path.join(parent_dir, 'data', 'rain_data.csv'))
+        try:
+            with st.spinner('Generando datos sintéticos...'):
+                generate_synthetic_data(output_file=os.path.join(parent_dir, 'data', 'rain_data.csv'))
+                
+            with st.spinner('Preprocesando datos...'):
+                preprocess_data(input_file=os.path.join(parent_dir, 'data', 'rain_data.csv'),
+                              output_file=os.path.join(parent_dir, 'data', 'processed_rain_data.csv'))
+                
+            with st.spinner('Entrenando modelo Random Forest...'):
+                train_model(input_file=os.path.join(parent_dir, 'data', 'processed_rain_data.csv'),
+                          model_file=model_path)
+                
+            model = joblib.load(model_path)
+            st.success("✅ Modelo entrenado y cargado correctamente.")
+        except Exception as e:
+            st.error(f"❌ Error fatal entrenando el modelo: {e}")
+            return None
             
-        with st.spinner('Preprocesando datos...'):
-            preprocess_data(input_file=os.path.join(parent_dir, 'data', 'rain_data.csv'),
-                          output_file=os.path.join(parent_dir, 'data', 'processed_rain_data.csv'))
-            
-        with st.spinner('Entrenando modelo Random Forest...'):
-            train_model(input_file=os.path.join(parent_dir, 'data', 'processed_rain_data.csv'),
-                      model_file=model_path)
-            
-        st.success("✅ Modelo entrenado correctamente en la nube.")
-        
-    try:
-        return joblib.load(model_path)
-    except Exception as e:
-        st.error(f"Error cargando el modelo: {e}")
-        return None
+    return model
 
 try:
     model = load_or_train_model()
 except Exception as e:
-    st.error(f"Error crítico en la inicialización: {e}")
+    st.error(f"Error crítico en validación inicial: {e}")
     model = None
 
 def main():
