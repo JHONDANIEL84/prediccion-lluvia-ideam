@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# No ignoramos data/ ni models/ para que este demo sea autocontenido en el repo del usuario,
+# aunque en producción real usualmente se ignoran.
