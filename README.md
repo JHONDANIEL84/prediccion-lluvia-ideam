@@ -1,134 +1,152 @@
-# 🌧️ Predicción de Precipitación - IDEAM
+Predicción de Precipitación - IDEAM
 
-Proyecto de Machine Learning para la predicción de precipitación utilizando Random Forest y despliegue con Streamlit.
+Proyecto de Machine Learning para la predicción de precipitación utilizando Random Forest y desplegado mediante Streamlit.
 
----
+Este proyecto integra modelado predictivo, contenerización con Docker y trabajo colaborativo con GitHub.
 
-## 👨‍🎓 Integrantes
+👨‍💻 Integrantes
 
-- **JHON DANIEL CALVACHE**
-- **DIEGO FERNANDO BOLAÑOS BUSTOS**
-- **STEFANNY IZQUIERDO RAMOS**
+JHÓN DANIEL CALVACHE
 
-📍 2026  
-🎓 Universidad Autónoma de Occidente  
+DIEGO FERNANDO BOLAÑOS BUSTOS
 
----
+STEFANNY IZQUIERDO RAMOS
 
-## 📌 Descripción del Proyecto
+📍 2026
+🎓 Universidad Autónoma de Occidente
 
-Este proyecto desarrolla un modelo de aprendizaje automático capaz de predecir la precipitación (mm) a partir de variables meteorológicas históricas.
+Descripción del Proyecto
 
-El sistema:
+El objetivo del proyecto es estimar la precipitación (mm) a partir de variables climáticas históricas, simulando escenarios de predicción meteorológica.
 
-- 📊 Procesa datos históricos
-- 🌲 Entrena un modelo Random Forest
-- 📈 Evalúa métricas de desempeño (MAE y R²)
-- 🖥️ Despliega una aplicación web interactiva con Streamlit
+El modelo fue entrenado utilizando el algoritmo Random Forest, un método de aprendizaje supervisado basado en múltiples árboles de decisión que mejora la precisión y reduce el sobreajuste.
 
----
+📊 Variables de Entrada
 
-## 🧠 Modelo Utilizado
+El modelo recibe como entrada:
 
-- Algoritmo: Random Forest Regressor  
-- División entrenamiento/prueba: 80% / 20%  
-- Métricas:
-  - MAE (Mean Absolute Error)
-  - R² Score  
+Lluvia día -1
 
----
+Lluvia día -2
 
-## 📂 Estructura del Proyecto
+Lluvia día -3
 
+Promedio últimos 3 días
+
+Promedio últimos 7 días
+
+Mes
+
+Evento extremo anterior
+
+Salida del modelo:
+
+🌧️ Precipitación estimada en milímetros (mm)
+
+🧠 Tecnologías Utilizadas
+
+Python 3.11+
+
+Random Forest (Machine Learning)
+
+Streamlit (interfaz web)
+
+Docker (contenerización)
+
+Git & GitHub (control de versiones)
+
+uv (gestión moderna de dependencias)
+
+🗂️ Estructura del Proyecto
 
 prediccion-lluvia-ideam/
 │
-├── app.py
-├── src/
-│ └── train_model.py
-├── data/ (no incluida en el repositorio)
-├── models/ (no incluida en el repositorio)
+├── main.py
+├── Dockerfile
 ├── pyproject.toml
+├── uv.lock
+├── .dockerignore
+├── .python-version
 └── README.md
 
+🐳 Contenerización con Docker
 
----
+La aplicación fue empaquetada en una imagen Docker para facilitar su despliegue y distribución.
 
-# ⚙️ Instalación con UV
+Construcción de la imagen
 
-## 1️⃣ Instalar UV (si no lo tienes)
+docker build -t prediccion-lluvia .
 
-En Windows PowerShell:
+Ejecutar el contenedor
+docker run -p 8501:8501 prediccion-lluvia
 
-```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+Abrir en el navegador:
+http://localhost:8501
 
-Verificar instalación:
+☁️ Publicación en Docker Hub
 
-uv --version
-2️⃣ Crear entorno virtual
+La imagen fue publicada en Docker Hub:
+jhondanielcalvache/prediccion-lluvia:latest
 
-Desde la raíz del proyecto:
+Proceso realizado:
+docker login
+docker tag prediccion-lluvia jhondanielcalvache/prediccion-lluvia:latest
+docker push jhondanielcalvache/prediccion-lluvia:latest
 
+Cualquier integrante puede ejecutarla con:
+docker pull jhondanielcalvache/prediccion-lluvia:latest
+docker run -p 8501:8501 jhondanielcalvache/prediccion-lluvia:latest
+
+🚀 Ejecución Local sin Docker
+
+Crear entorno virtual y sincronizar dependencias:
 uv venv
-
-Activar entorno:
-
-.venv\Scripts\activate
-3️⃣ Instalar dependencias
-
-Si usas pyproject.toml:
-
 uv sync
+uv run streamlit run main.py
 
-O si usas requirements.txt:
+👥 Trabajo Colaborativo
 
-uv pip install -r requirements.txt
-📊 Entrenar el Modelo
+El proyecto se gestiona mediante GitHub.
 
-Colocar el dataset dentro de la carpeta data/.
+Flujo recomendado:
 
-Luego ejecutar:
+Crear una rama:
+git checkout -b nombre-funcionalidad
 
-uv run python src/train_model.py
+Realizar cambios:
+git add .
+git commit -m "Descripción del cambio"
+git push origin nombre-funcionalidad
 
-Esto generará el modelo entrenado en la carpeta models/.
+Crear Pull Request hacia main.
 
-🚀 Ejecutar la Aplicación
+⚠️ No trabajar directamente sobre main.
 
-Una vez entrenado el modelo:
+📊 Estado del Proyecto
 
-uv run streamlit run app.py
+✅ Modelo Random Forest entrenado
 
-La aplicación se abrirá automáticamente en el navegador.
+✅ Aplicación web funcional
 
-🔬 Tecnologías Utilizadas
+✅ Contenerizada con Docker
 
-Python
+✅ Imagen publicada en Docker Hub
 
-UV (gestor moderno de entornos y dependencias)
+✅ Repositorio actualizado en GitHub
 
-Pandas
+✅ Flujo colaborativo definido
 
-Scikit-Learn
+🎓 Contexto Académico
 
-Streamlit
+Proyecto universitario orientado a:
 
-Git & GitHub
+Implementación de modelos de Machine Learning
 
-📚 Contexto Académico
+Despliegue de aplicaciones predictivas
 
-Proyecto desarrollado como parte de la formación en Inteligencia Artificial.
-Universidad Autónoma de Occidente - 2026
+Contenerización profesional
 
-📌 Notas Importantes
+Trabajo colaborativo con control de versiones
 
-Los datos y modelos entrenados no se incluyen en el repositorio.
+Buenas prácticas de documentación técnica
 
-Para ejecutar el proyecto es necesario contar con el dataset original.
-
-Proyecto con fines académicos.
-
-📜 Licencia
-
-Uso educativo.
