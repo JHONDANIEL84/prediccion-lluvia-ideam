@@ -108,6 +108,51 @@ uv run streamlit run main.py
 
 El proyecto se gestiona mediante GitHub.
 
+🧪 Testing Automatizado
+
+El proyecto incluye pruebas automatizadas utilizando pytest, garantizando la correcta ejecución de funciones y la estabilidad del código.
+
+Se utiliza uv como gestor de dependencias para la instalación y ejecución de las pruebas.
+
+📦 Instalación de pytest
+
+uv add pytest --dev
+
+📁 Estructura de pruebas
+prediccion-lluvia-ideam/
+│
+├── tests/
+│   └── test_basico.py
+
+Los archivos de prueba deben:
+
+Comenzar con test_
+
+Contener funciones que inicien con test_
+
+Ejemplo:
+
+def test_suma_simple():
+    assert 2 + 2 == 4
+
+    ▶️ Ejecutar pruebas
+
+Desde la raíz del proyecto:
+uv run pytest -v
+
+Salida esperada:
+tests/test_basico.py::test_suma_simple PASSED
+
+Objetivo del Testing
+
+Validar la correcta ejecución de funciones
+
+Prevenir errores al agregar nuevas funcionalidades
+
+Mantener estabilidad en el trabajo colaborativo
+
+Implementar buenas prácticas de desarrollo profesional
+
 Flujo recomendado:
 
 Crear una rama:
@@ -135,6 +180,8 @@ Crear Pull Request hacia main.
 ✅ Repositorio actualizado en GitHub
 
 ✅ Flujo colaborativo definido
+
+✅ Testing automatizado con pytest
 
 🎓 Contexto Académico
 
