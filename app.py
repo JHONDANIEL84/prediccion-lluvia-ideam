@@ -1,46 +1,61 @@
+# app.py
 import streamlit as st
-import pandas as pd
-import joblib
+import mlflow
+import pickle  # si tu modelo está guardado como .pkl
 import os
 
-st.set_page_config(page_title="Predicción IDEAM", layout="wide")
+# --------------------------
+# Configuración de MLflow
+# --------------------------
+MLRUNS_DIR = "./mlruns"
+mlflow.set_tracking_uri(MLRUNS_DIR)
+mlflow.set_experiment("prediccion_lluvia")
 
-MODEL_PATH = "models/rain_model.pkl"
+# --------------------------
+# Cargar modelo
+# --------------------------
+# Ajusta la ruta según donde tengas tu modelo
+MODELO_PATH = "modelo_lluvia.pkl"
 
-@st.cache_resource
-def load_model():
-    if os.path.exists(MODEL_PATH):
-        return joblib.load(MODEL_PATH)
-    return None
-
-model = load_model()
-
-st.title("🌧️ Predicción de Precipitación")
-
-if model is None:
-    st.error("❌ No se encontró el modelo. Ejecuta primero: python src/train_model.py")
+if os.path.exists(MODELO_PATH):
+    with open(MODELO_PATH, "rb") as f:
+        modelo = pickle.load(f)
 else:
+    st.warning("Modelo no encontrado. Sube tu modelo .pkl")
+    modelo = None
 
-    lag1 = st.number_input("Lluvia día -1", value=0.0)
-    lag2 = st.number_input("Lluvia día -2", value=0.0)
-    lag3 = st.number_input("Lluvia día -3", value=0.0)
-    mm3 = st.number_input("Promedio 3 días", value=0.0)
-    mm7 = st.number_input("Promedio 7 días", value=0.0)
-    mes = st.slider("Mes", 1, 12, 1)
-    extremo = st.selectbox("Evento extremo previo", [0, 1])
+# --------------------------
+# Función para registrar predicciones
+# --------------------------
+def registrar_prediccion(input_data: dict, pred: float):
+    """
+    Guarda la predicción en MLflow
+    """
+    with mlflow.start_run():
+        mlflow.log_params(input_data)  # registra las variables de entrada
+        mlflow.log_metric("prediccion_lluvia_mm", pred)  # registra la predicción
 
-    if st.button("Predecir"):
+# --------------------------
+# Interfaz de Streamlit
+# --------------------------
+st.title("Predicción de lluvia 🌧️")
 
-        input_data = pd.DataFrame([{
-            "lag1": lag1,
-            "lag2": lag2,
-            "lag3": lag3,
-            "mm3": mm3,
-            "mm7": mm7,
-            "mes": mes,
-            "extremo": extremo
-        }])
+# Inputs de usuario
+temp = st.number_input("Temperatura (°C)", min_value=-50.0, max_value=50.0, value=25.0)
+hum = st.number_input("Humedad (%)", min_value=0.0, max_value=100.0, value=80.0)
+viento = st.number_input("Velocidad del viento (km/h)", min_value=0.0, max_value=200.0, value=10.0)
 
-        prediction = model.predict(input_data)[0]
+if st.button("Predecir lluvia"):
 
-        st.success(f"🌧️ Precipitación estimada: {prediction:.2f} mm")
+    if modelo:
+        # Preparar datos
+        input_data = {"temp": temp, "hum": hum, "viento": viento}
+        # Hacer predicción
+        pred = modelo.predict([list(input_data.values())])[0]
+        st.success(f"Predicción de lluvia: {pred:.2f} mm")
+        
+        # Guardar en MLflow
+        registrar_prediccion(input_data, pred)
+        st.info("Predicción registrada en MLflow ✅")
+    else:
+        st.error("No hay modelo cargado para hacer predicción")
