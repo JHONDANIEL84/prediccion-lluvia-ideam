@@ -1,61 +1,85 @@
-# app.py
+import pandas as pd
+import pickle
+from sklearn.preprocessing import StandardScaler
 import streamlit as st
-import mlflow
-import pickle  # si tu modelo está guardado como .pkl
-import os
 
-# --------------------------
-# Configuración de MLflow
-# --------------------------
-MLRUNS_DIR = "./mlruns"
-mlflow.set_tracking_uri(MLRUNS_DIR)
-mlflow.set_experiment("prediccion_lluvia")
+st.set_page_config(page_title="Predicción de Lluvia IDEAM 🌧️", layout="centered")
+st.title("Predicción de Lluvia IDEAM 🌧️")
 
-# --------------------------
-# Cargar modelo
-# --------------------------
-# Ajusta la ruta según donde tengas tu modelo
-MODELO_PATH = "modelo_lluvia.pkl"
+# -------------------------------
+# 1️⃣ Cargar modelo entrenado
+# -------------------------------
+try:
+    with open("models/rain_model.pkl", "rb") as f:
+        modelo_cargado = pickle.load(f)
+    st.success("✅ Modelo cargado correctamente")
+except FileNotFoundError:
+    st.error("❌ No se encontró el archivo 'rain_model.pkl'. Asegúrate de que esté en la carpeta 'models'.")
+    st.stop()
+except Exception as e:
+    st.error(f"❌ Error cargando el modelo: {e}")
+    st.stop()
 
-if os.path.exists(MODELO_PATH):
-    with open(MODELO_PATH, "rb") as f:
-        modelo = pickle.load(f)
-else:
-    st.warning("Modelo no encontrado. Sube tu modelo .pkl")
-    modelo = None
+# -------------------------------
+# 2️⃣ Cargar dataset para predicción
+# -------------------------------
+try:
+    df = pd.read_csv("data/dataset_modelo_estacion_52045020.csv")
+    st.write("Dataset cargado correctamente. Primeras filas:")
+    st.dataframe(df.head())
+except FileNotFoundError:
+    st.error("❌ No se encontró el archivo CSV. Asegúrate de que esté en 'data/dataset_modelo_estacion_52045020.csv'.")
+    st.stop()
+except Exception as e:
+    st.error(f"❌ Error cargando el dataset: {e}")
+    st.stop()
 
-# --------------------------
-# Función para registrar predicciones
-# --------------------------
-def registrar_prediccion(input_data: dict, pred: float):
-    """
-    Guarda la predicción en MLflow
-    """
-    with mlflow.start_run():
-        mlflow.log_params(input_data)  # registra las variables de entrada
-        mlflow.log_metric("prediccion_lluvia_mm", pred)  # registra la predicción
+# -------------------------------
+# 3️⃣ Seleccionar columnas correctas
+# -------------------------------
+columnas_modelo = ["lag1", "lag2", "lag3", "mm3", "mm7", "mes", "extremo"]
+if not all(col in df.columns for col in columnas_modelo):
+    st.error(f"❌ Las columnas esperadas {columnas_modelo} no están en el dataset")
+    st.stop()
 
-# --------------------------
-# Interfaz de Streamlit
-# --------------------------
-st.title("Predicción de lluvia 🌧️")
+X_nuevo = df[columnas_modelo].iloc[:5]  # primeras 5 filas como ejemplo
 
-# Inputs de usuario
-temp = st.number_input("Temperatura (°C)", min_value=-50.0, max_value=50.0, value=25.0)
-hum = st.number_input("Humedad (%)", min_value=0.0, max_value=100.0, value=80.0)
-viento = st.number_input("Velocidad del viento (km/h)", min_value=0.0, max_value=200.0, value=10.0)
+# -------------------------------
+# 4️⃣ Escalar datos
+# -------------------------------
+scaler = StandardScaler()
+X_nuevo_scaled = scaler.fit_transform(X_nuevo)
+
+# -------------------------------
+# 5️⃣ Hacer predicciones automáticas
+# -------------------------------
+try:
+    predicciones = modelo_cargado.predict(X_nuevo_scaled)
+    st.subheader("Predicciones automáticas del dataset:")
+    for i, pred in enumerate(predicciones):
+        st.write(f"Fila {i+1}: Predicción lluvia = {pred}")
+except Exception as e:
+    st.error(f"❌ Error al hacer la predicción: {e}")
+
+# -------------------------------
+# 6️⃣ Predicción manual por usuario
+# -------------------------------
+st.subheader("Predicción manual")
+st.write("Ingresa los valores para las 7 características:")
+
+lag1 = st.number_input("lag1", value=float(df['lag1'].mean()))
+lag2 = st.number_input("lag2", value=float(df['lag2'].mean()))
+lag3 = st.number_input("lag3", value=float(df['lag3'].mean()))
+mm3 = st.number_input("mm3", value=float(df['mm3'].mean()))
+mm7 = st.number_input("mm7", value=float(df['mm7'].mean()))
+mes = st.number_input("mes", value=int(df['mes'].mode()[0]), min_value=1, max_value=12)
+extremo = st.selectbox("extremo (0=No, 1=Sí)", options=[0, 1], index=int(df['extremo'].mode()[0]))
 
 if st.button("Predecir lluvia"):
-
-    if modelo:
-        # Preparar datos
-        input_data = {"temp": temp, "hum": hum, "viento": viento}
-        # Hacer predicción
-        pred = modelo.predict([list(input_data.values())])[0]
-        st.success(f"Predicción de lluvia: {pred:.2f} mm")
-        
-        # Guardar en MLflow
-        registrar_prediccion(input_data, pred)
-        st.info("Predicción registrada en MLflow ✅")
-    else:
-        st.error("No hay modelo cargado para hacer predicción")
+    try:
+        X_manual = [[lag1, lag2, lag3, mm3, mm7, mes, extremo]]
+        X_manual_scaled = scaler.fit_transform(X_manual)  # ⚠️ si guardaste scaler, usarlo
+        pred_manual = modelo_cargado.predict(X_manual_scaled)[0]
+        st.success(f"🌧️ Predicción de lluvia: {pred_manual}")
+    except Exception as e:
+        st.error(f"❌ Error al predecir manualmente: {e}")
