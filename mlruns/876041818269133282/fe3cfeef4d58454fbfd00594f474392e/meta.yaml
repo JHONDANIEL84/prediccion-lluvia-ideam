@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/prediccion-lluvia-ideam/mlruns/876041818269133282/fe3cfeef4d58454fbfd00594f474392e/artifacts
+end_time: 1772580454776
+entry_point_name: ''
+experiment_id: '876041818269133282'
+lifecycle_stage: active
+run_id: fe3cfeef4d58454fbfd00594f474392e
+run_name: Ejecucion_Final_Modelo
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1772580449207
+status: 3
+tags: []
+user_id: jhond

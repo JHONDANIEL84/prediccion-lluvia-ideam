@@ -1,0 +1,10 @@
+artifact_location: file:///C:/prediccion-lluvia-ideam/mlruns/876041818269133282/models/m-b2a992113d144013a2e06bcaacb8d6cd/artifacts
+creation_timestamp: 1772580450506
+experiment_id: '876041818269133282'
+last_updated_timestamp: 1772580454750
+model_id: m-b2a992113d144013a2e06bcaacb8d6cd
+model_type: null
+name: modelo_clasificacion_lluvia
+source_run_id: fe3cfeef4d58454fbfd00594f474392e
+status: 2
+status_message: null

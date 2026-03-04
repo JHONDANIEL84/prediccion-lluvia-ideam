@@ -1,0 +1,7 @@
+artifact_location: /app/mlruns/248188285292563919
+creation_time: 1772514312325
+experiment_id: '248188285292563919'
+last_update_time: 1772514312325
+lifecycle_stage: active
+name: prediccion_lluvia
+workspace: default
