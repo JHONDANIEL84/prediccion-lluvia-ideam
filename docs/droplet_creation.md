@@ -27,4 +27,4 @@ Follow these steps to create your server (Droplet) in DigitalOcean.
 
 ## 7. Get the IP Address
 - Once the Droplet is created, you will see a public **IPv4 address** (e.g., `157.230.1.2`).
-- **Copy this IP and share it with me!**
+
