@@ -1,5 +1,5 @@
 import pandas as pd
-import pickle
+import joblib
 from sklearn.preprocessing import StandardScaler
 import streamlit as st
 
@@ -10,8 +10,7 @@ st.title("Predicción de Lluvia IDEAM 🌧️")
 # 1️⃣ Cargar modelo entrenado
 # -------------------------------
 try:
-    with open("models/rain_model.pkl", "rb") as f:
-        modelo_cargado = pickle.load(f)
+    modelo_cargado = joblib.load("models/rain_model.pkl")
     st.success("✅ Modelo cargado correctamente")
 except FileNotFoundError:
     st.error("❌ No se encontró el archivo 'rain_model.pkl'. Asegúrate de que esté en la carpeta 'models'.")
