@@ -1,5 +1,22 @@
 # Predicción de Lluvia IDEAM 🌧️
 
+1.
+Información General del Proyecto
+
+Título del Proyecto: PREDICCIÓN DE LLUVIA IDEAM.
+
+Asignatura: Desarrollo de Proyectos de IA.
+
+Institución: UAO Virtual.
+
+Integrantes:
+
+Jhon Daniel Calvache
+
+Diego Fernando Bolaños Bustos
+
+Stefanny Izquierdo Ramos.
+
 Este proyecto utiliza Machine Learning (SGDClassifier) para predecir la probabilidad de lluvia basada en datos históricos de estaciones del IDEAM en Colombia.
 
 ## 🚀 Características
